@@ -7,25 +7,25 @@
       <div class="column is-8">
         <div class="card edit-detail">
           <header class="card-header">
-            <p class="card-header-title"></p>
+            <p class="card-header-title">{{ hero.firstName }}</p>
           </header>
           <div class="card-content">
             <div class="content">
               <div class="field">
                 <label class="label" for="id">id</label>
-                <label class="input" id="id" readonly></label>
+                <label class="input" id="id" readonly>{{ hero.id }}</label>
               </div>
               <div class="field">
                 <label class="label" for="firstName">first name</label>
-                <input class="input" id="firstName" />
+                <input class="input" id="firstName" v-model="hero.firstName" />
               </div>
               <div class="field">
                 <label class="label" for="lastName">last name</label>
-                <input class="input" id="lastName" />
+                <input class="input" id="lastName" v-model="hero.lastName"/>
               </div>
               <div class="field">
                 <label class="label" for="description">description</label>
-                <textarea class="input" id="description" type="text" />
+                <textarea class="input" id="description" type="text"  v-model="hero.description"/>
               </div>
               <div class="field">
                 <label class="label">cape color</label>
@@ -66,17 +66,17 @@
             </div>
           </div>
           <footer class="card-footer">
-            <button class="link card-footer-item cancel-button">
+            <button class="link card-footer-item cancel-button" v-on:click="cancelHero" >
               <i class="fas fa-undo"></i>
               <span>Cancel</span>
             </button>
-            <button class="link card-footer-item">
+            <button class="link card-footer-item" v-on:click="saveHero">
               <i class="fas fa-save"></i>
               <span>Save</span>
             </button>
           </footer>
         </div>
-        <div class="notification is-info"></div>
+        <div class="notification is-info"><pre>{{ message }}</pre></div>
       </div>
     </div>
   </div>
@@ -85,5 +85,27 @@
 <script>
 export default {
   name: 'Heroes',
+  data() {
+    return {
+      hero: {
+        id: 1,
+        firstName: 'Mr Mee',
+        lastName: 'Akin',
+        description: 'some random bits',
+        capeColor: '',
+        power: '',
+        active: true,
+      },
+      message: 'random',
+    }
+  },
+  methods: {
+    cancelHero(){
+      this.message = '' 
+    },
+    saveHero(){
+      this.message = JSON.stringify(this.hero, null, '\n')
+    }
+  } 
 };
 </script>
