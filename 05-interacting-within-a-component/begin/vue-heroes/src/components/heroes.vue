@@ -27,7 +27,7 @@
       <div class="column is-4" v-if="selectedHero">
         <div class="card">
           <header class="card-header">
-            <p class="card-header-title">{{ selectedHero.firstName }}</p>
+            <p class="card-header-title">{{ fullName }}</p>
           </header>
           <div class="card-content">
             <div class="content">
@@ -61,6 +61,31 @@
                   v-model="selectedHero.description"
                 />
               </div>
+              <div class="field">
+                <label class="label" for="originDate">origin date</label>
+                <input
+                  type="date"
+                  class="input"
+                  id="originDate"
+                  v-model="selectedHero.originDate"
+                />
+                <p class="comment">
+                  My origin story began on {{ selectedHero.originDate | shortDate }}
+                </p>
+              </div>
+              <div class="field">
+                <label class="label" for="capeCounter">cape counter</label>
+                <input
+                  class="input"
+                  id="capeCounter"
+                  type="number"
+                  v-model="selectedHero.capeCounter"
+                />
+              </div>
+              <div class="field">
+                <label class="label" for="capeMessage">cape message</label>
+                <label class="input" name="capeMessage">{{ capeMessage }}</label>
+              </div>
             </div>
           </div>
           <footer class="card-footer">
@@ -83,35 +108,83 @@
 </template>
 
 <script>
+import { format } from 'date-fns';
+
+const inputDateFormat = 'YYYY-MM-DD';
+const displayDateFormat = 'MMM DD, YYYY';
 const ourHeroes = [
   {
     id: 10,
     firstName: 'Ella',
     lastName: 'Papa',
     description: 'fashionista',
+    capeCounter: 1,
+    originDate: formatDateWithSpecificFormat(new Date(1992, 12, 12))
   },
   {
     id: 20,
     firstName: 'Madelyn',
     lastName: 'Papa',
     description: 'the cat whisperer',
+    capeCounter: 2,
+    originDate: formatDateWithSpecificFormat(new Date(1992, 2, 15))
   },
   {
     id: 30,
     firstName: 'Haley',
     lastName: 'Papa',
     description: 'pen wielder',
+    capeCounter: 7,
+    originDate: formatDateWithSpecificFormat(new Date(1992, 6, 14))
   },
   {
-    id: 40,
-    firstName: 'Landon',
-    lastName: 'Papa',
-    description: 'arc trooper',
+    id: 1,
+    firstName: 'Deanoo',
+    lastName: 'Test',
+    description: 'houseakinator',
+    capeCounter: 2,
+    originDate: formatDateWithSpecificFormat(new Date(1992, 6, 12))
   },
 ];
+
+function formatDateWithSpecificFormat(dateToFormat){
+  return format(dateToFormat, inputDateFormat)
+};
+
 export default {
   name: 'Heroes',
+  data() {
+    return {
+      heroes: [],
+      selectedHero: undefined,
+      message: '',
+      capeMessage: '',
+    }
+  },
+  computed: {
+    fullName() {
+      return `${this.selectedHero.firstName} ${this.selectedHero.lastName}` 
+    }
+  },
+  created() {
+    this.loadHeroes();
+  },
   methods: {
+    async loadHeroes()
+    {
+      this.heroes = [];
+      this.message = 'Getting the heroes. Please wait';
+      this.heroes = await this.getHeroes();
+      this.message = '';
+    },
+    async getHeroes()
+    {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(ourHeroes), 1500);
+        });
+
+      return ourHeroes;
+    },
     handleTheCapes(newValue) {
       const value = parseInt(newValue, 10);
       switch (value) {
@@ -141,5 +214,21 @@ export default {
       this.selectedHero = hero;
     },
   },
+  watch: {
+    'selectedHero.capeCounter': {
+      immediate: true,
+      // deep allows us to watch nested properties
+      // deep: true,
+      handler(newValue, oldValue) {
+        console.log(`Watcher evaluated. old=${oldValue}, new=${newValue}`)
+        this.handleTheCapes(newValue)
+      }
+    }
+  },
+  filters: {
+    shortDate: function(value) {
+      return format(value, displayDateFormat);
+    }
+  }
 };
 </script>
